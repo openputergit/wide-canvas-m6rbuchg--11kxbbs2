@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कंपनी कर्मचारी व्यवस्थापन</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Marathi:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    * {
+        font-family: 'Noto Sans Marathi', sans-serif;
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+</style>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-6 text-center">कंपनी कर्मचारी व्यवस्थापन प्रणाली</h1>
+
+        <div class="mb-4">
+            <label class="block mb-2">कंपनी निवडा:</label>
+            <select id="companySelect" class="w-full p-2 border rounded">
+                <option value="A">कंपनी A</option>
+                <option value="B">कंपनी B</option>
+                <option value="C">कंपनी C</option>
+                <option value="D">कंपनी D</option>
+                <option value="E">कंपनी E</option>
+                <option value="F">कंपनी F</option>
+                <option value="G">कंपनी G</option>
+            </select>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-3 bg-blue-100 rounded">
+                    <h3>एकूण मनुष्यबळ</h3>
+                    <input type="number" class="total-strength w-full p-2 border rounded" value="0">
+                </div>
+                <div class="p-3 bg-green-100 rounded">
+                    <h3>किरकोळ रजा</h3>
+                    <input type="number" class="casual-leave w-full p-2 border rounded" value="0">
+                </div>
+                <div class="p-3 bg-yellow-100 rounded">
+                    <h3>अर्जित रजा</h3>
+                    <input type="number" class="earned-leave w-full p-2 border rounded" value="0">
+                </div>
+                <div class="p-3 bg-red-100 rounded">
+                    <h3>आजारपण</h3>
+                    <input type="number" class="sick-leave w-full p-2 border rounded" value="0">
+                </div>
+                <div class="p-3 bg-purple-100 rounded">
+                    <h3>गैरहजर</h3>
+                    <input type="number" class="absent w-full p-2 border rounded" value="0">
+                </div>
+                <div class="p-3 bg-orange-100 rounded">
+                    <h3>इतर</h3>
+                    <input type="number" class="others w-full p-2 border rounded" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h2 class="text-xl mb-4">दैनिक अहवाल</h2>
+            <div class="mb-4">
+                <label>दिनांक निवडा:</label>
+                <input type="date" id="reportDate" class="p-2 border rounded">
+            </div>
+            <canvas id="dailyChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+        const companyData = {
+            'A': { total: 100, casual: 5, earned: 3, sick: 2, absent: 1, others: 1 },
+            'B': { total: 150, casual: 7, earned: 4, sick: 3, absent: 2, others: 1 },
+            'C': { total: 200, casual: 10, earned: 6, sick: 4, absent: 3, others: 2 },
+            'D': { total: 175, casual: 8, earned: 5, sick: 3, absent: 2, others: 1 },
+            'E': { total: 125, casual: 6, earned: 4, sick: 2, absent: 1, others: 1 },
+            'F': { total: 225, casual: 11, earned: 7, sick: 5, absent: 3, others: 2 },
+            'G': { total: 160, casual: 8, earned: 5, sick: 3, absent: 2, others: 1 }
+        };
+
+        function updateInputs(company) {
+            const data = companyData[company];
+            document.querySelector('.total-strength').value = data.total;
+            document.querySelector('.casual-leave').value = data.casual;
+            document.querySelector('.earned-leave').value = data.earned;
+            document.querySelector('.sick-leave').value = data.sick;
+            document.querySelector('.absent').value = data.absent;
+            document.querySelector('.others').value = data.others;
+            updateChart();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('dailyChart').getContext('2d');
+            const data = {
+                labels: ['एकूण मनुष्यबळ', 'किरकोळ रजा', 'अर्जित रजा', 'आजारपण', 'गैरहजर', 'इतर'],
+                datasets: [{
+                    label: 'कर्मचारी संख्या',
+                    data: [
+                        document.querySelector('.total-strength').value,
+                        document.querySelector('.casual-leave').value,
+                        document.querySelector('.earned-leave').value,
+                        document.querySelector('.sick-leave').value,
+                        document.querySelector('.absent').value,
+                        document.querySelector('.others').value
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('companySelect').addEventListener('change', (e) => {
+            updateInputs(e.target.value);
+        });
+
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('change', updateChart);
+        });
+
+        document.getElementById('reportDate').valueAsDate = new Date();
+        updateInputs('A');
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
